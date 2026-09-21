@@ -1,0 +1,42 @@
+services:
+  node-app:
+    build: ./node
+    container_name: node-app
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 10s docker-entrypoint.sh
+    command: ["node", "index.js"]
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - revproxy
+
+  nginx:
+    build: ./nginx
+    container_name: nginx-proxy
+    ports:
+      - "8080:80"
+    depends_on:
+      - node-app
+    networks:
+      - revproxy
+
+  db:
+    image: mysql:8.0
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro 
+    environment:
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - revproxy
+
+networks:
+  revproxy:
+    name: revproxy   
+    driver: bridge  
