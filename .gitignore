@@ -36,4 +36,5 @@ build/
 
 # Arquivos do sistema operacional
 .DS_Store
-Thumbs.db   
+Thumbs.db
+mysql/
