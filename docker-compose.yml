@@ -2,8 +2,12 @@ services:
   node-app:
     build: ./node
     container_name: node-app
-    entrypoint: dockerize -wait tcp://db:3306 -timeout 10s docker-entrypoint.sh
+    restart: always
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 60s docker-entrypoint.sh
     command: ["node", "index.js"]
+    volumes:
+      - ./node:/usr/src/app
+      - /usr/src/app/node_modules
     ports:
       - "3000:3000"
     depends_on:
